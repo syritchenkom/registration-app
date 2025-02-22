@@ -32,12 +32,12 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
       .catch((err) => console.error("Error fetching holidays:", err));
   }, []);
 
-  const isDateDisabled = (date: string) => {
-    const parsedDate = new Date(date);
-    const formattedDate = format(parsedDate, "yyyy-MM-dd");
-    const holiday = holidays.find((h) => h.date === formattedDate);
-    return holiday?.type === "NATIONAL_HOLIDAY" || parsedDate.getDay() === 0;
-  };
+  // const isDateDisabled = (date: string) => {
+  //   const parsedDate = new Date(date);
+  //   const formattedDate = format(parsedDate, "yyyy-MM-dd");
+  //   const holiday = holidays.find((h) => h.date === formattedDate);
+  //   return holiday?.type === "NATIONAL_HOLIDAY" || parsedDate.getDay() === 0;
+  // };
 
   const handleMonthChange = (direction: "prev" | "next") => {
     setCurrentMonth((prev) =>
