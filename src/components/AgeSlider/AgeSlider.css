@@ -1,0 +1,53 @@
+/* Slider container */
+.slider-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  
+  /* Min/Max labels */
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  
+  /* Slider wrapper */
+  .slider-wrapper {
+    position: relative;
+    width: 100%;
+  }
+  
+  /* Slider track */
+  .custom-slider {
+    width: 100%;
+    appearance: none;
+    height: 6px;
+    border-radius: 4px;
+    outline: none;
+  }
+  
+  /* Custom thumb (Only for Chrome) */
+  .custom-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #761be4;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 3px solid white;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Value indicator */
+  .slider-indicator {
+    position: absolute;
+    bottom: -30px;
+    transform: translateX(-50%);
+    transition: all 0.2s ease;
+  }
