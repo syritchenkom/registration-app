@@ -1,113 +1,108 @@
-// components/Form.tsx
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { format } from 'date-fns';
-import FormField from './FormField';
-import Button from './Button';
-import Message from './Message';
-import AgeSlider from './AgeSlider';
+import React, { useState } from "react";
+import axios from "axios";
 
-const API_URL = 'https://api.api-ninjas.com/v1/holidays';
-const API_KEY = '8DX8eEe67njS1lbThFsdSw==rQQNpQ8PYbPZBjrx';
-const SUBMIT_URL = 'http://letsworkout.pl/submit';
+// Example sub-components
+import FormField from "./FormField";
+import Button from "./Button";
+import AgeSlider from "./AgeSlider/AgeSlider";
+import { UploadPhoto } from "./UploadPhoto";
+import Calendar from "./Calendar";
 
-interface HolidayType {
-    date: string;
-    type: string;
-    name: string;
-}
+const SUBMIT_URL = "http://letsworkout.pl/submit";
 
 interface FormDataType {
-  [key: string]: string | number;
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
-  date: string;
   age: number;
+  date: string;
+  time?: string;
 }
 
 export const Form: React.FC = () => {
   const [formData, setFormData] = useState<FormDataType>({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
-    date: "",
     age: 8,
+    date: "",
+    time: "",
   });
-  const [holidays, setHolidays] = useState<HolidayType[]>([]);
-  const [message, setMessage] = useState('');
 
-  useEffect(() => {
-    axios
-      .get(API_URL, {
-        params: { country: 'PL', year: 2024 },
-        headers: { 'X-Api-Key': API_KEY },
-      })
-      .then((res) => setHolidays(res.data))
-      .catch((err) => console.error('Error fetching holidays:', err));
-  }, []);
+  const [message, setMessage] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-  const isDateDisabled = (date: string) => {
-
-    const parsedDate = new Date(date);
-    if(isNaN(parsedDate.getTime())) {
-        return false;
-    }
-    const formattedDate = format(parsedDate, 'yyyy-MM-dd');
-    const holiday = holidays.find((h) => h.date === formattedDate);
-    return (
-      holiday?.type === 'NATIONAL_HOLIDAY' || new Date(date).getDay() === 0
-    );
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleAgeChange = (age: number) => {
-    setFormData((prevData) => ({ ...prevData, age }));
+    setFormData((prev) => ({ ...prev, age }));
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target;
-    setFormData((prevData) =>({...prevData, [name]: value}));
+  const handleFileSelect = (file: File) => {
+    setSelectedFile(file);
+  };
 
-    // setFormData({ ...formData, [name]: value });
-    // if (name === 'date') {
-    //     const parsedDate = new Date(value);
-    //     if(isNaN(parsedDate.getTime())) {
-    //       const holiday = holidays.find((h) => h.date === value);
-    //       setMessage(holiday?.type === 'OBSERVANCE' ? `Info: ${holiday.name}` : '');
-            
-    //     }
-    // }
+  const handleDateChange = (date: string) => {
+    setFormData((prev) => ({ ...prev, date }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (
+      !formData.date ||
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.email
+    ) {
+      setMessage("Please fill in all required fields!");
+      return;
+    }
+
     const data = new FormData();
     Object.keys(formData).forEach((key) => {
-        data.append(key, formData[key].toString());
-      });
+      data.append(
+        key,
+        (formData[key as keyof FormDataType] as string).toString()
+      );
+    });
+    if (selectedFile) {
+      data.append("photo", selectedFile);
+    }
+
     try {
       await axios.post(SUBMIT_URL, data);
-      alert('Application submitted!');
+      alert("Application submitted!");
     } catch (error) {
-      console.error('Submission error:', error);
+      console.error("Submission error:", error);
     }
   };
 
+  const isFormValid =
+    formData.firstName && formData.lastName && formData.email && formData.date;
+
   return (
-    <div className="max-w-md mx-auto p-4 bg-white shadow-md rounded-lg">
-      <h2 className="text-xl font-bold mb-4 text-black">Personal info</h2>
-      <form onSubmit={handleSubmit} className="space-y-4 text-black">
+    <div className="w-full rounded-lg">
+      <form
+        onSubmit={handleSubmit}
+        className="space-y-4 w-full mx-auto sm:w-[342px] lg:w-[426px]"
+      >
+        <h2 className="text-2xl font-medium mb-3">Personal info</h2>
         <FormField
           label="First Name"
           type="text"
-          name="name"
-          value={formData.name}
+          name="firstName"
+          value={formData.firstName}
           onChange={handleChange}
           required
         />
         <FormField
           label="Last Name"
           type="text"
-          name="name"
-          value={formData.name}
+          name="lastName"
+          value={formData.lastName}
           onChange={handleChange}
           required
         />
@@ -119,19 +114,22 @@ export const Form: React.FC = () => {
           onChange={handleChange}
           required
         />
-        <AgeSlider age={formData.age} onAgeChange={handleAgeChange}/>
-        <FormField
-          label="Date"
-          type="date"
-          name="date"
-          value={formData.date}
-          onChange={handleChange}
-          required
-          disabled={isDateDisabled(formData.date)}
+        <AgeSlider age={formData.age} onAgeChange={handleAgeChange} />
+        <UploadPhoto onFileSelect={handleFileSelect} />
+        <h2 className="text-2xl font-medium mb-3">Your workout</h2>
+        <Calendar
+          selectedDate={formData.date}
+          onDateChange={handleDateChange}
         />
-        
-        {message && <Message text={message} />}
-        <Button type="submit">Send Application</Button>
+        <Button
+          type="submit"
+          disabled={!isFormValid}
+          className={`${
+            isFormValid ? "bg-[#761BE4] hover:bg-[#9747FF]" : "bg-[#CBB6E5]"
+          } text-white py-2 px-4 rounded w-full transition-all duration-200 disabled:cursor-not-allowed`}
+        >
+          Send Application
+        </Button>
       </form>
     </div>
   );
