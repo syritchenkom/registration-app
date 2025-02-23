@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { format, isSameMonth, isSameDay, addMonths, subMonths } from "date-fns";
 
-const API_URL = "https://api.api-ninjas.com/v1/holidays";
-const API_KEY = "8DX8eEe67njS1lbThFsdSw==rQQNpQ8PYbPZBjrx";
+const API_URL = "https://api-ninjas.com/api/holidays";
+const API_KEY = "OH+HEf/9IH2zuHR/cMO/8g==ldhBovC6Rpa1TIss";
 
 interface HolidayType {
   date: string;
@@ -32,12 +32,13 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
       .catch((err) => console.error("Error fetching holidays:", err));
   }, []);
 
-  // const isDateDisabled = (date: string) => {
-  //   const parsedDate = new Date(date);
-  //   const formattedDate = format(parsedDate, "yyyy-MM-dd");
-  //   const holiday = holidays.find((h) => h.date === formattedDate);
-  //   return holiday?.type === "NATIONAL_HOLIDAY" || parsedDate.getDay() === 0;
-  // };
+  const isDateDisabled = (date: Date) => {
+    const formattedDate = format(date, "yyyy-MM-dd");
+    const holiday = holidays.find((h) => h.date === formattedDate);
+    return (
+      date.getDay() === 0 || (holiday && holiday?.type === "NATIONAL_HOLIDAY")
+    );
+  };
 
   const handleMonthChange = (direction: "prev" | "next") => {
     setCurrentMonth((prev) =>
@@ -46,36 +47,48 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
   };
 
   const handleDateClick = (date: Date) => {
+    if (isDateDisabled(date)) return; // blocked date handling
     const formattedDate = format(date, "yyyy-MM-dd");
     onDateChange(formattedDate);
     const holiday = holidays.find((h) => h.date === formattedDate);
-    setMessage(holiday?.type === "OBSERVANCE" ? `Info: ${holiday.name}` : "");
+    if (holiday && holiday.type === "OBSERVANCE") {
+      setMessage(`Info: ${holiday.name}`);
+    } else {
+      setMessage("");
+    }
   };
 
   const handleTimeClick = (time: string) => {
     setSelectedTime(time);
   };
 
-  const weekDays = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const weekDays = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+
+  const firstDayOfMonth = new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth(),
+    1
+  );
+  const adjustedDay =
+    firstDayOfMonth.getDay() === 0 ? 7 : firstDayOfMonth.getDay();
+  const startDate = new Date(
+    currentMonth.getFullYear(),
+    currentMonth.getMonth(),
+    1 - (adjustedDay - 1)
+  );
 
   // Generate dates for the current month and display in a grid
   const datesArray = Array.from({ length: 42 }, (_, index) => {
-    const startOfMonth = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth(),
-      1
+    return new Date(
+      startDate.getFullYear(),
+      startDate.getMonth(),
+      startDate.getDate() + index
     );
-    const firstDayOfMonth = startOfMonth.getDay();
-    const date = new Date(
-      currentMonth.getFullYear(),
-      currentMonth.getMonth(),
-      index - firstDayOfMonth + 1
-    );
-    return date;
   });
 
   const isInCurrentMonth = (date: Date) => isSameMonth(date, currentMonth);
-  const isSelected = (date: Date) => isSameDay(date, new Date(selectedDate));
+  const isSelected = (date: Date) =>
+    selectedDate && isSameDay(date, new Date(selectedDate));
 
   return (
     <div className="w-full mb-[48px] flex flex-col md:flex-row gap-4">
@@ -84,21 +97,43 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
         <h3>Date</h3>
         <div className="w-full w-[343px] md:w-[326px] rounded border border-[#CBB6E5] bg-white p-4">
           {/* Header with month navigation */}
-          <div className="flex justify-between items-center mb-4">
+          <div className="flex justify-around items-center mb-4">
             <button
               onClick={() => handleMonthChange("prev")}
-              className="p-1 rounded hover:bg-gray-100"
+              className="p-1 rounded hover:bg-gray-100 cursor-pointer"
             >
-              &lt;
+              <svg
+                width="11"
+                height="14"
+                viewBox="0 0 11 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M0.499999 7.86602C-0.166668 7.48112 -0.166667 6.51888 0.5 6.13397L9.5 0.937821C10.1667 0.552921 11 1.03405 11 1.80385L11 12.1962C11 12.966 10.1667 13.4471 9.5 13.0622L0.499999 7.86602Z"
+                  fill="#CBB6E5"
+                />
+              </svg>
             </button>
             <div className="font-semibold">
               {format(currentMonth, "MMMM yyyy")}
             </div>
             <button
               onClick={() => handleMonthChange("next")}
-              className="p-1 rounded hover:bg-gray-100"
+              className="p-1 rounded hover:bg-gray-100 cursor-pointer"
             >
-              &gt;
+              <svg
+                width="11"
+                height="14"
+                viewBox="0 0 11 14"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M10.5 7.86602C11.1667 7.48112 11.1667 6.51888 10.5 6.13397L1.5 0.937821C0.833334 0.552921 6.10471e-07 1.03405 5.76822e-07 1.80385L1.2256e-07 12.1962C8.8911e-08 12.966 0.833333 13.4471 1.5 13.0622L10.5 7.86602Z"
+                  fill="#CBB6E5"
+                />
+              </svg>
             </button>
           </div>
 
@@ -113,7 +148,8 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
           <div className="grid grid-cols-7 text-center gap-y-2">
             {datesArray.map((day) => {
               const isInCurrentMonthDay = isInCurrentMonth(day);
-              const isSelectedDay = selectedDate && isSelected(day);
+              const isSelectedDay = isSelected(day);
+              const disabled = isDateDisabled(day);
 
               return (
                 <div
@@ -122,11 +158,15 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
                 ${
                   !isInCurrentMonthDay
                     ? "text-gray-400"
+                    : disabled
+                    ? "text-[#898DA9] cursor-none"
                     : isSelectedDay
                     ? "bg-purple-500 text-white"
                     : "hover:bg-purple-100"
                 }`}
-                  onClick={() => isInCurrentMonthDay && handleDateClick(day)}
+                  onClick={() =>
+                    isInCurrentMonthDay && !disabled && handleDateClick(day)
+                  }
                 >
                   {format(day, "d")}
                 </div>
@@ -134,6 +174,11 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
             })}
           </div>
         </div>
+        {message && (
+          <div className="mt-2 p-2 bg-blue-100 text-blue-700 rounded">
+            {message}
+          </div>
+        )}
       </div>
 
       {/* Time selection section */}

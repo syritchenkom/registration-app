@@ -29,7 +29,6 @@ export const Form: React.FC = () => {
     time: "",
   });
 
-  const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -57,7 +56,6 @@ export const Form: React.FC = () => {
       !formData.lastName ||
       !formData.email
     ) {
-      setMessage("Please fill in all required fields!");
       return;
     }
 
