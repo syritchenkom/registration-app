@@ -51,7 +51,7 @@ export const UploadPhoto: React.FC<UploadPhotoProps> = ({ onFileSelect }) => {
       <p className="block text-base">Photo</p>
 
       <div
-        className={`border-1 p-4 rounded-md text-center bg-white ${
+        className={`border-1 pt-[42px] pb-[42px] rounded-md text-center bg-white ${
           dragActive ? "border-blue-500" : "border-[#CBB6E5]"
         }`}
         onDragEnter={handleDrag}
