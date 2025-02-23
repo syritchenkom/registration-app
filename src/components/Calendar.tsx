@@ -80,7 +80,7 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
   return (
     <div className="w-full flex flex-col md:flex-row gap-4">
       {/* Calendar */}
-      <div className="max-w-[326px] md:w-[343px]">
+      <div>
         <h3>Date</h3>
         <div className="w-full w-[343px] md:w-[326px] rounded border border-[#CBB6E5] bg-white p-4">
           {/* Header with month navigation */}
@@ -138,23 +138,25 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
 
       {/* Time selection section */}
       {selectedDate && (
-        <div className="w-[76px]">
+        <div className="w-[76px] sm:w-[342px]">
           <h3>Time</h3>
-          <div className="flex flex-row md:flex-col gap-2">
-            {["12:00", "14:00", "16:30", "18:30", "20:00"].map((time) => (
-              <button
-                key={time}
-                onClick={() => handleTimeClick(time)}
-                className={`px-4 py-2 text-left rounded border
+          <div>
+            <div className="flex flex-row sm:flex-wrap gap-2">
+              {["12:00", "14:00", "16:30", "18:30", "20:00"].map((time) => (
+                <button
+                  key={time}
+                  onClick={() => handleTimeClick(time)}
+                  className={`px-4 py-2 text-center w-[80px] rounded border
                 ${
                   selectedTime === time
                     ? "bg-white text-black border-2 border-[#761BE4]"
                     : "bg-white text-black border-[#CBB6E5] hover:bg-purple-100"
                 }`}
-              >
-                {time}
-              </button>
-            ))}
+                >
+                  {time}
+                </button>
+              ))}
+            </div>
           </div>
         </div>
       )}
