@@ -84,7 +84,7 @@ export const Form: React.FC = () => {
     formData.firstName && formData.lastName && formData.email && formData.date;
 
   return (
-    <div className="w-full rounded-lg">
+    <div className="w-full my-8 rounded-lg">
       <form
         onSubmit={handleSubmit}
         className="space-y-4 w-full mx-auto sm:w-[342px] lg:w-[426px]"
