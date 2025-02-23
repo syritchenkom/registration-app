@@ -78,7 +78,7 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
   const isSelected = (date: Date) => isSameDay(date, new Date(selectedDate));
 
   return (
-    <div className="w-full flex flex-col md:flex-row gap-4">
+    <div className="w-full mb-[48px] flex flex-col md:flex-row gap-4">
       {/* Calendar */}
       <div>
         <h3>Date</h3>
@@ -138,20 +138,20 @@ const Calendar: React.FC<CalendarProps> = ({ selectedDate, onDateChange }) => {
 
       {/* Time selection section */}
       {selectedDate && (
-        <div className="w-[76px] sm:w-[342px]">
+        <div className="sm:w-[342px] lg:w-[426px]">
           <h3>Time</h3>
           <div>
-            <div className="flex flex-row sm:flex-wrap gap-2">
+            <div className="flex flex-wrap justify-between gap-2">
               {["12:00", "14:00", "16:30", "18:30", "20:00"].map((time) => (
                 <button
                   key={time}
                   onClick={() => handleTimeClick(time)}
-                  className={`px-4 py-2 text-center w-[80px] rounded border
-                ${
-                  selectedTime === time
-                    ? "bg-white text-black border-2 border-[#761BE4]"
-                    : "bg-white text-black border-[#CBB6E5] hover:bg-purple-100"
-                }`}
+                  className={`px-4 py-2 text-center rounded border w-[76px] sm:w-auto
+            ${
+              selectedTime === time
+                ? "bg-white text-black border-2 border-[#761BE4]"
+                : "bg-white text-black border-[#CBB6E5] hover:bg-purple-100"
+            }`}
                 >
                   {time}
                 </button>
