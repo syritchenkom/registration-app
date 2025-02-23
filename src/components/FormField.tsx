@@ -20,7 +20,6 @@ const FormField: React.FC<FormFieldProps> = ({
   disabled = false,
 }) => {
   const [error, setError] = useState(false);
-  const [sliderValue, setSliderValue] = useState(50);
 
   const validateEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
